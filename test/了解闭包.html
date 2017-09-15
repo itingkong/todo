@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		// function a (){
+		// 	function b(){
+		// 		console.log('hello')
+		// 	}
+		// 	return	b;
+		// }
+		// var fn = a();
+		// fn()
+		function a(){
+			var count = 0;
+			function b(){
+				count++
+				console.log(count)
+			}
+			return b
+		}
+		var fn = a();
+		fn();
+		fn();
+		fn();
+	</script>
+</body>
+</html>

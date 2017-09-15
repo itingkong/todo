@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        canvas {
+            border: 1px dashed red;
+        }
+    </style>
+    <!-- <script src="./productDatas.js"></script> -->
+</head>
+<body>
+    <canvas width="600" height="400"></canvas>
+</body>
+<script>
+    var cas = document.querySelectorAll( 'canvas' )[ 0 ];
+    var ctx = cas.getContext( '2d' );
+    
+    //CoordinateSystem
+    function CoordinateSystem(options){
+      //初始化所有的数据
+      this.left = options.left;
+      this.top = options.top;
+      this.buttom = options.buttom;
+      this.right = options.right;
+
+      this.lineWidth = options.lineWidth;
+      this.strokeStyle = options.strokeStyle;
+
+      this.width = options.width;
+      this.height = options.height;
+    }
+
+    CoordinateSystem.prototype = {
+      constructor:CoordinateSystem,
+
+      draw:function( ctx ){
+        //绘制坐标系
+        ctx.beginPath();
+        ctx.lineWidth = this.lineWidth;
+        ctx.strokeStyle = this.strokeStyle;
+
+        var paddingLeft = this.left,
+            paddingTop = this.top,
+            paddingRight = this.right,
+            paddingBottom = this.bottom
+
+            //coordinate
+        var coor1X = paddingLeft,
+            coor1Y = paddingTop,
+            coor2X = coor1X,
+            coor2Y = this.height - paddingBottom,
+            coor3X = this.width - paddingRight,
+            coor3Y = coor2Y;
+            //绘制坐标轴
+        ctx.moveTo(coor1X, coor1Y);
+        ctx.lineTo(coor2X, coor2Y);        
+        ctx.lineTo(coor3X, coor3Y); 
+        ctx.stroke();       
+      },
+
+      joinLine:function(ctx, line){
+        //分析代码
+        var arr = line.options;
+
+        arr.sort((a, b) => a.x - b.x );
+
+        var maxX = arr[arr.length - 1].x;
+        var maxY = Math.max.apply(null,arr.map( v => v.y) );
+
+        var coorWidth = this.width - this.left - this.right,
+            coorHeight = this.height - this.top - this.bottom;
+
+        var ox = this.left,
+            oy = this.height - this.bottom;
+
+            //计算比例
+            // scaleX：500 ：maxX == 绘制的坐标 ：随机数的值
+            // scaleY：300 ：maxY == 绘制的坐标 ：随机数的值
+
+        var scaleX = coorWidth / maxX,
+            scaleY = coorHeight / maxY;
+            // console.log(scaleY)  
+            //使用随机数值 * scale
+            //就可以得到应该绘制的点坐标了
+
+            //接下来要的就是将 arr 映射成 坐标系上的点的数组
+
+            arr = arr.map( v => {
+              return {
+                x: ox + o.x * scaleX,
+                y: oy - v.y * scaleY,
+                absX: v.x * scaleX,
+                absY: v.y * scaleY,
+                originX: v.x,
+                originY: v.y
+              };
+            });
+
+            ctx.beginPath();
+            ctx.fillStyle = line.fillStyle;
+            //开始遍历，绘制点到 坐标系中
+            for( var i = 0; i < arr.length; i++){
+              var point = arr[i];
+
+              ctx.moveTo( point.x - line.pointWidth / 2, point.y - line.pointWidth / 2);
+              ctx.lineTo( point.x + line.pointWidth / 2, point.y - line.pointWidth / 2);
+              ctx.lineTo( point.x + line.pointWidth / 2, point.y + line.pointWidth / 2);
+              ctx.lineTo( point.x - line.pointWidth / 2, point.y + line.pointWidth / 2);
+              ctx.stroke();
+            }  
+            ctx.fill(); 
+
+            // 再次使用一个循环绘制连线
+            ctx.beginPath();
+            ctx.strokeStyle = line.strokeStyle;
+            ctx.lineWidth = line.lineWidth;
+            ctx.lineJoin = 'round';
+
+            for(var i = 0; i < arr.length; i++){
+              var point = arr[i];
+
+              ctx.lineTo( point.x, point.y);
+            }
+            ctx.stroke();
+      }
+    }
+    
+    
+</script>
+</html>
